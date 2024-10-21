@@ -3,8 +3,8 @@ import path from 'node:path';
 import db from './config/connection.js';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import typeDefs from '../src/schemas/typeDefs.js';
-import resolvers from '../src/schemas/resolvers.js';
+import typeDefs from './schemas/typeDefs.js';
+import resolvers from './schemas/resolvers.js';
 
 
 const app = express();
@@ -17,16 +17,22 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 }
 
+// Apollo Server setup
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  formatError: (err) => {
+    
+    console.error(err);
+    return {
+      message: err.message,
+    };
+  },
 });
 
 const startApolloServer = async () => {
   await server.start();
   app.use('/graphql', expressMiddleware(server));
-
-  // app.use(routes);
 
   db.once('open', () => {
     app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));

@@ -27,7 +27,7 @@ const resolvers = {
         throw new AuthenticationError('Something went wrong!');
       }
 
-      const token = signToken(username, email, user._id);
+      const token = signToken(username, email, user.id);
       return { token, user };
     },
 
@@ -43,7 +43,7 @@ const resolvers = {
         throw new AuthenticationError('Incorrect password!');
       }
 
-      const token = signToken(user.username, email, user._id);
+      const token = signToken(user.username, email, user.id);
       return { token, user };
     },
 
