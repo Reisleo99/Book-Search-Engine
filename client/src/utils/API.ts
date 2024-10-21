@@ -1,60 +1,93 @@
+// src/api/API.ts
+
+import { GET_ME } from '../utils/queries';
+import { CREATE_USER, LOGIN_USER, SAVE_BOOK, DELETE_BOOK } from '../utils/mutations';
 import type { User } from '../models/User.js';
 import type { Book } from '../models/Book.js';
 
-// route to get logged in user's info (needs the token)
-export const getMe = (token: string) => {
-  return fetch('/api/users/me', {
+export const getMe = async (token: string) => {
+  const response = await fetch('/graphql', {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({ query: GET_ME }),
   });
+
+  return response.json();
 };
 
-export const createUser = (userData: User) => {
-  return fetch('/api/users', {
+export const createUser = async (userData: User) => {
+  const variables = {
+    username: userData.username,
+    email: userData.email,
+    password: userData.password,
+  };
+
+  const response = await fetch('/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(userData),
+    body: JSON.stringify({ query: CREATE_USER, variables }),
   });
+
+  return response.json();
 };
 
-export const loginUser = (userData: User) => {
-  return fetch('/api/users/login', {
+export const loginUser = async (userData: User) => {
+  const variables = {
+    email: userData.email,
+    password: userData.password,
+  };
+
+  const response = await fetch('/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(userData),
+    body: JSON.stringify({ query: LOGIN_USER, variables }),
   });
+
+  return response.json();
 };
 
-// save book data for a logged in user
-export const saveBook = (bookData: Book, token: string) => {
-  return fetch('/api/users', {
-    method: 'PUT',
+export const saveBook = async (bookData: Book, token: string) => {
+  const variables = {
+    book: {
+      bookId: bookData.bookId,
+      title: bookData.title,
+      authors: bookData.authors,
+      description: bookData.description,
+      image: bookData.image,
+      link: bookData.link,
+    },
+  };
+
+  const response = await fetch('/graphql', {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(bookData),
+    body: JSON.stringify({ query: SAVE_BOOK, variables }),
   });
+
+  return response.json();
 };
 
-// remove saved book data for a logged in user
-export const deleteBook = (bookId: string, token: string) => {
-  return fetch(`/api/users/books/${bookId}`, {
-    method: 'DELETE',
+export const deleteBook = async (bookId: string, token: string) => {
+  const variables = { bookId };
+
+  const response = await fetch('/graphql', {
+    method: 'POST',
     headers: {
+      'Content-Type': 'application/json',
       authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({ query: DELETE_BOOK, variables }),
   });
-};
 
-// make a search to google books api
-// https://www.googleapis.com/books/v1/volumes?q=harry+potter
-export const searchGoogleBooks = (query: string) => {
-  return fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}`);
+  return response.json();
 };
