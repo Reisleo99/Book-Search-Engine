@@ -5,6 +5,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import typeDefs from './schemas/typeDefs.js';
 import resolvers from './schemas/resolvers.js';
 import { Request, Response } from 'express';
+import { authenticateToken } from './services/auth.js';
 
 
 const app = express();
@@ -37,7 +38,7 @@ const server = new ApolloServer({
 
 const startApolloServer = async () => {
   await server.start();
-  app.use('/graphql', expressMiddleware(server));
+  app.use('/graphql', expressMiddleware(server, { context: authenticateToken}));
 
   db.once('open', () => {
     app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));

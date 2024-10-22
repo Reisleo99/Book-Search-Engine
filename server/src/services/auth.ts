@@ -9,23 +9,22 @@ interface JwtPayload {
 }
 
 
-export const authenticateToken = (authHeader: string | undefined) => {
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
+export const authenticateToken = ({ req }: any) => {
+  let token = req.body.token || req.query.token || req.headers.authorization;
 
-    const secretKey = process.env.JWT_SECRET_KEY || '';
-
-    try {
-      
-      const user = jwt.verify(token, secretKey) as JwtPayload;
-
-      return user; 
-    } catch (err) {
-      console.error('Invalid token', err);
-      throw new Error('Invalid or expired token');
-    }
+  if (req.headers.authorization) token = token.split(' ').pop().trim();
+  
+  if (!token) return req;
+  
+  try {
+    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
+    req.user = data;
+  } catch (err) {
+    console.log(err);
+    console.log('Invalid token');
   }
-  throw new Error('Authorization token is required');
+
+  return req;
 };
 
 export const signToken = (username: string, email: string, _id: string) => {

@@ -6,13 +6,13 @@ import type { User } from '../models/User';
 import { useMutation } from '@apollo/client';
 import { ADD_USER } from '../utils/mutations';
 
-// biome-ignore lint/correctness/noEmptyPattern: <explanation>
+
 const SignupForm = ({}: { handleModalClose: () => void }) => {
-  // set initial form state
+ 
   const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
-  // set state for form validation
+
   const [validated] = useState(false);
-  // set state for alert
+
   const [showAlert, setShowAlert] = useState(false);
   
   const [addUser] = useMutation(ADD_USER);
@@ -32,12 +32,12 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
     }
 
     try {
-      // Call the ADD_USER mutation
+
       const { data } = await addUser({
         variables: { ...userFormData },
       });
 
-      Auth.login(data.addUser.token); // Use the token from the response
+      Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
