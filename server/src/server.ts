@@ -1,10 +1,10 @@
 import express from 'express';
-import path from 'node:path';
 import db from './config/connection.js';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import typeDefs from './schemas/typeDefs.js';
 import resolvers from './schemas/resolvers.js';
+import { Request, Response } from 'express';
 
 
 const app = express();
@@ -14,7 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  app.use(express.static('../client/dist'));
+
+  app.get('*', (_req: Request, res: Response) => {
+    res.sendFile('../client/dist/index.html');
+});
+
 }
 
 // Apollo Server setup
