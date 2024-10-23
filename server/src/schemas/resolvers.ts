@@ -46,7 +46,7 @@ const resolvers = {
   Mutation: {
     addUser: async (_: unknown, { input }: AddUser): Promise<{ token: string; user: User }> => {
       const user = await User.create({ ...input });
-      const token = signToken(user.username, user.email, user.id);
+      const token = signToken(user.username, user.email, user._id);
 
       return { token, user };
     },
@@ -64,7 +64,7 @@ const resolvers = {
         throw new AuthenticationError('Incorrect password!');
       }
 
-      const token = signToken(user.username, email, user.id);
+      const token = signToken(user.username, email, user._id);
       return { token, user };
     },
 
