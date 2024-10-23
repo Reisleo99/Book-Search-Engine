@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Backend (TypeScript)",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/server/src/server.ts", // Entry point of your application
+        "preLaunchTask": "",
+        "outFiles": [
+          "${workspaceFolder}/server/dist/server.js"
+        ],
+        "sourceMaps": true,
+        "cwd": "${workspaceFolder}",
+        "skipFiles": ["<node_internals>/"],
+        "restart": true,
+        "console": "integratedTerminal"
+    
+      }
+    ]
+  }

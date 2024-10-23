@@ -2,34 +2,55 @@ import User from '../models/User.js';
 import { AuthenticationError } from 'apollo-server';
 import { signToken } from '../services/auth.js';
 
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  password: string;
+  bookCount: number;
+}
+
+interface AddUser {
+  input: {
+    username: string;
+    email: string;
+    password: string;
+  };
+}
+
+// interface AddBook {
+//   input: {
+//     bookId: string;
+//     title: string;
+//     authors: Array<string>;
+//     description: string;
+//     image: string;
+//     link: string;
+//   }
+// }
+
+interface Context {
+  user?: User;
+}
+
+
 const resolvers = {
   Query: {
-    me: async (_: any, __: any, context: any) => {
-      if (context.user) {
-        const foundUser = await User.findOne({
-          $or: [{ _id: context.user._id }, { username: context.user.username }],
-        });
+    me: async (_: unknown, __: unknown, context: Context): Promise<User | null> => {
+      if (!context.user) throw new AuthenticationError('Could not find user');
 
-        if (!foundUser) {
-          throw new AuthenticationError('Cannot find a user with this id!');
-        }
-        return foundUser;
-      }
-      throw new AuthenticationError('You need to be logged in!');
+      return await User.findOne({ _id: context.user._id });
     },
   },
 
   Mutation: {
-    addUser: async (_: any, { username, email, password }: any) => {
-      const user = await User.create({ username, email, password });
+    addUser: async (_: unknown, { input }: AddUser): Promise<{ token: string; user: User }> => {
+      const user = await User.create({ ...input });
+      const token = signToken(user.username, user.email, user.id);
 
-      if (!user) {
-        throw new AuthenticationError('Something went wrong!');
-      }
-
-      const token = signToken(username, email, user.id);
       return { token, user };
     },
+
 
     login: async (_: any, { email, password }: any) => {
       const user = await User.findOne({ $or: [{ username: email }, { email }] });
