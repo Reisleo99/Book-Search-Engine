@@ -10,13 +10,7 @@ interface User {
   bookCount: number;
 }
 
-interface AddUser {
-  input: {
-    username: string;
-    email: string;
-    password: string;
-  };
-}
+
 
 // interface AddBook {
 //   input: {
@@ -44,10 +38,9 @@ const resolvers = {
   },
 
   Mutation: {
-    addUser: async (_: unknown, { input }: AddUser): Promise<{ token: string; user: User }> => {
-      const user = await User.create({ ...input });
+    addUser: async (_: unknown, { input }: { input: { username: string, email: string, password: string } }): Promise<{ token: string; user: User }> => {
+      const user = await User.create(input);
       const token = signToken(user.username, user.email, user._id);
-
       return { token, user };
     },
 

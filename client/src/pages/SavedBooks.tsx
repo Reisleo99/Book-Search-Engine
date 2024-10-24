@@ -7,6 +7,14 @@ import { GET_ME } from '../utils/queries'; // Import the GET_ME query
 import { DELETE_BOOK } from '../utils/mutations'; // Import the REMOVE_BOOK mutation
 import type { User } from '../models/User';
 
+interface IBook {
+  _id: string;
+  description: string;
+  image: string;
+  link: string;
+  title: string;
+}
+
 const SavedBooks = () => {
   const [userData, setUserData] = useState<User>({
     username: '',
@@ -18,7 +26,7 @@ const SavedBooks = () => {
   const { loading, data } = useQuery(GET_ME, {
     onCompleted: (data) => {
       if (data?.me) {
-        setUserData(data.me); // Update the state with the user data from the query
+        setUserData(data.me);
       }
     },
     onError: (error) => console.error(error),
@@ -27,13 +35,12 @@ const SavedBooks = () => {
   const [removeBook] = useMutation(DELETE_BOOK, {
     onCompleted: (data) => {
       if (data?.removeBook) {
-        setUserData(data.removeBook); // Update the user data after deleting the book
+        setUserData(data.removeBook);
       }
     },
     onError: (error) => console.error(error),
   });
 
-  // Create function that accepts the book's mongo _id value as param and deletes the book using the mutation
   const handleDeleteBook = async (bookId: string) => {
     try {
       const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -43,17 +50,15 @@ const SavedBooks = () => {
       }
 
       await removeBook({
-        variables: { bookId }, // Pass bookId as a variable to the mutation
+        variables: { bookId },
       });
 
-      // Upon success, remove the book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
     }
   };
 
-  // If data is still loading, show a loading message
   if (loading) {
     return <h2>LOADING...</h2>;
   }

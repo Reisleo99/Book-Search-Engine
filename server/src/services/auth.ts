@@ -8,7 +8,6 @@ interface JwtPayload {
   email: string;
 }
 
-
 export const authenticateToken = ({ req }: any) => {
   let token = req.body.token || req.query.token || req.headers.authorization;
 
@@ -17,8 +16,8 @@ export const authenticateToken = ({ req }: any) => {
   if (!token) return req;
   
   try {
-    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
-    req.user = data;
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
+    req.user = decodedToken;
   } catch (err) {
     console.log(err);
     console.log('Invalid token');

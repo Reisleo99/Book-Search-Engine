@@ -7,26 +7,20 @@ import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
 import { searchGoogleBooks } from '../utils/API';
-// Import your GraphQL mutation
 import { SAVE_BOOK } from '../utils/mutations';
 
 const SearchBooks = () => {
-  // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
-  // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
-  // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
-  // Apollo Client mutation hook for saving books
   const [saveBook] = useMutation(SAVE_BOOK);
 
-  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
+
   useEffect(() => {
     return () => saveBookIds(savedBookIds);
   });
 
-  // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   
@@ -58,7 +52,6 @@ const SearchBooks = () => {
     }
   };
 
-  // create function to handle saving a book to our database using GraphQL
   const handleSaveBook = async (bookId: string) => {
     const bookToSave: Book = searchedBooks.find((book) => book.bookId === bookId)!;
     const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -68,16 +61,19 @@ const SearchBooks = () => {
     }
 
     try {
-      // Execute the SAVE_BOOK mutation using Apollo Client
       const { data } = await saveBook({
-        variables: { bookData: { ...bookToSave } },
+        variables: { input: { ...bookToSave } },
+        context: {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
       });
 
       if (!data) {
         throw new Error('something went wrong!');
       }
 
-      // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
       console.error(err);
