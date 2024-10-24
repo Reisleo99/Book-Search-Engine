@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'node:path';
 import type { Request, Response } from 'express';
 // Import the ApolloServer class
 import {
