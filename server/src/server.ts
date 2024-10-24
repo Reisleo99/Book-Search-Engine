@@ -1,5 +1,5 @@
 import express from 'express';
-import path from 'path';
+import { Request, Response } from 'express';
 import {
   ApolloServer,
 } from '@apollo/server';
@@ -35,8 +35,8 @@ const startApolloServer = async () => {
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static('../client/dist'));
 
-    app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(__dirname, 'path-to-your-build-folder', 'index.html'));
+    app.get('*', (_req: Request, res: Response) => {
+      res.sendFile('../client/dist/index.html');
     });
   }
 
