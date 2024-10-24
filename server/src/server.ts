@@ -1,6 +1,5 @@
 import express from 'express';
-import type { Request, Response } from 'express';
-// Import the ApolloServer class
+import path from 'path';
 import {
   ApolloServer,
 } from '@apollo/server';
@@ -8,7 +7,6 @@ import {
   expressMiddleware
 } from '@apollo/server/express4';
 import { authenticateToken } from './services/auth.js';
-// Import the two parts of a GraphQL schema
 import { typeDefs, resolvers } from './schemas/index.js';
 import db from './config/connection.js';
 
@@ -21,7 +19,6 @@ const server = new ApolloServer({
 
 const app = express();
 
-// Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async () => {
   await server.start();
   await db;
@@ -38,8 +35,8 @@ const startApolloServer = async () => {
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static('../client/dist'));
 
-    app.get('*', (_req: Request, res: Response) => {
-      res.sendFile('../client/dist/index.html');
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(__dirname, 'path-to-your-build-folder', 'index.html'));
     });
   }
 
@@ -50,5 +47,4 @@ const startApolloServer = async () => {
 
 };
 
-// Call the async function to start the server
 startApolloServer();
