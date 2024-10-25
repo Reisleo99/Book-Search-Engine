@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-import Auth from '../utils/auth';
-import { removeBookId } from '../utils/localStorage';
-import { useQuery, useMutation } from '@apollo/client'; // Apollo hooks
-import { GET_ME } from '../utils/queries'; // Import the GET_ME query
-import { DELETE_BOOK } from '../utils/mutations'; // Import the REMOVE_BOOK mutation
+import { useQuery, useMutation } from '@apollo/client';
+import { GET_ME } from '../utils/queries';
+import { DELETE_BOOK } from '../utils/mutations';
 import type { User } from '../models/User';
 
 interface IBook {
@@ -34,8 +32,11 @@ const SavedBooks = () => {
 
   const [removeBook] = useMutation(DELETE_BOOK, {
     onCompleted: (data) => {
-      if (data?.removeBook) {
-        setUserData(data.removeBook);
+      if (data?.removeBook) { 
+        setUserData((prevState) => ({
+          ...prevState,
+          savedBooks: data.removeBook.savedBooks,
+        }));
       }
     },
     onError: (error) => console.error(error),
@@ -43,17 +44,7 @@ const SavedBooks = () => {
 
   const handleDeleteBook = async (bookId: string) => {
     try {
-      const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-      if (!token) {
-        return false;
-      }
-
-      await removeBook({
-        variables: { bookId },
-      });
-
-      removeBookId(bookId);
+      await removeBook({ variables: { bookId } });
     } catch (err) {
       console.error(err);
     }

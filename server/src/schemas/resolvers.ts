@@ -11,18 +11,6 @@ interface User {
 }
 
 
-
-// interface AddBook {
-//   input: {
-//     bookId: string;
-//     title: string;
-//     authors: Array<string>;
-//     description: string;
-//     image: string;
-//     link: string;
-//   }
-// }
-
 interface Context {
   user?: User;
 }
